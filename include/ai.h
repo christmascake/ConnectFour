@@ -1,0 +1,6 @@
+#ifndef CONNECTFOUR_INCLUDE_AI_H_
+#define CONNECTFOUR_INCLUDE_AI_H_
+
+#include "game.h"
+
+#endif  // !CONNECTFOUR_INCLUDE_AI_H_

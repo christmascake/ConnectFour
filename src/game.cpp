@@ -1,16 +1,39 @@
 #include "game.h"
 
+#include <iostream>
+
 namespace connect_four {
 
 ConnectFour::ConnectFour() : board{} { this->clear_board(); }
 
 bool ConnectFour::make_move(const int row, const int col) {
-  if (this->board.at(row).at(col) == Side::none) {
-    this->board.at(row).at(col) =
-        (this->is_red_turn) ? Side::red : Side::yellow;
+  // if not placing checker at top
+  if (row != 0) {
+    return false;
+  }
+
+  // if not clicking empty slot
+  if (this->board.at(row).at(col) != Side::none) {
+    return false;
+  }
+
+  // drop checker
+  for (auto i = 0; i < board_rows; i++) {
+    if (this->board.at(i).at(col) != Side::none) {
+      this->board.at(i - 1).at(col) =
+          (this->is_red_turn) ? Side::red : Side::yellow;
+      this->is_red_turn = !this->is_red_turn;
+      return true;
+    }
+  }
+
+  // put checker on bottom
+  if (this->board.at(5).at(col) == Side::none) {
+    this->board.at(5).at(col) = (this->is_red_turn) ? Side::red : Side::yellow;
     this->is_red_turn = !this->is_red_turn;
     return true;
   }
+
   return false;
 }
 

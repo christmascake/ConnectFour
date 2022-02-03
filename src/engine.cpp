@@ -70,7 +70,7 @@ void update_checkers() {
   }
 }
 
-void update_side_to_move_text() {
+void update_text() {
   if (current_game->get_is_red_turn()) {
     side_to_move_text.setString("Red Move");
     side_to_move_text.setFillColor(sf::Color::Red);
@@ -104,7 +104,7 @@ void handle_mouse() {
       try {
         if (current_game->make_move(row, col)) {
           update_checkers();
-          update_side_to_move_text();
+          update_text();
         }
       } catch (...) {
       }

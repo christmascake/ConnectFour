@@ -20,6 +20,8 @@ class ConnectFour {
 
   bool make_move(const int row, const int col);
 
+  bool get_is_red_turn() const noexcept;
+
   Side getSideAt(const int row, const int col) const noexcept;
 
  private:

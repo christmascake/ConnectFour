@@ -14,6 +14,8 @@ bool ConnectFour::make_move(const int row, const int col) {
   return false;
 }
 
+bool ConnectFour::get_is_red_turn() const noexcept { return this->is_red_turn; }
+
 ConnectFour::Side ConnectFour::getSideAt(const int row,
                                          const int col) const noexcept {
   return this->board.at(row).at(col);

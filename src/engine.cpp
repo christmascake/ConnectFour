@@ -2,22 +2,22 @@
 
 #include <SFML/Graphics.hpp>
 #include <array>
+#include <iostream>
 #include <memory>
+#include <stdexcept>
+#include <vector>
+
+#include "assets.h"
 
 namespace connect_four {
 namespace engine {
 namespace {
 
-constexpr auto window_icon_size = 32;
-constexpr auto window_width = 700;
+constexpr auto window_width = 1000;
 constexpr auto window_height = 600;
 constexpr auto window_title = "Connect Four";
 constexpr auto window_style = sf::Style::Titlebar | sf::Style::Close;
 constexpr auto window_fps_limit = 30;
-
-constexpr auto checker_radius = 50;
-
-constexpr auto gravity = 9.80665F;
 
 std::unique_ptr<ConnectFour> current_game = std::make_unique<ConnectFour>();
 
@@ -27,12 +27,6 @@ std::array<std::array<sf::CircleShape, ConnectFour::board_cols>,
            ConnectFour::board_rows>
     circle_render_board;
 
-const sf::Image windowIcon = [] {
-  sf::Image t;
-  t.loadFromFile("../assets/icon.png");
-  return t;
-}();
-
 const std::unique_ptr<sf::RenderWindow> window = [] {
   auto t = std::make_unique<sf::RenderWindow>(
       sf::VideoMode(window_width, window_height), window_title, window_style);
@@ -41,19 +35,15 @@ const std::unique_ptr<sf::RenderWindow> window = [] {
   return t;
 }();
 
-const sf::CircleShape checker_circle = [] {
-  sf::CircleShape t(checker_radius);
+sf::Text side_to_move_text = [] {
+  auto t = consola_text;
+  t.setPosition(750, 10);
+  t.setString("Red Move");
   t.setFillColor(sf::Color::Red);
   return t;
 }();
 
-const sf::Texture background_texture = [] {
-  sf::Texture t;
-  t.loadFromFile("../assets/cfour.png");
-  return t;
-}();
-
-const sf::Sprite background_sprite(background_texture);
+std::vector<sf::Text*> text_to_render = {&side_to_move_text};
 
 void reset() {
   current_game.reset();
@@ -80,6 +70,16 @@ void update_checkers() {
   }
 }
 
+void update_side_to_move_text() {
+  if (current_game->get_is_red_turn()) {
+    side_to_move_text.setString("Red Move");
+    side_to_move_text.setFillColor(sf::Color::Red);
+  } else {
+    side_to_move_text.setString("Yellow Move");
+    side_to_move_text.setFillColor(sf::Color::Yellow);
+  }
+}
+
 void handle_keyboard() {
   if (ev.type == sf::Event::KeyPressed) {
     switch (ev.key.code) {
@@ -101,8 +101,12 @@ void handle_mouse() {
       auto row = ev.mouseButton.y / 100;
       auto col = ev.mouseButton.x / 100;
 
-      if (current_game->make_move(row, col)) {
-        update_checkers();
+      try {
+        if (current_game->make_move(row, col)) {
+          update_checkers();
+          update_side_to_move_text();
+        }
+      } catch (...) {
       }
     }
   }
@@ -128,8 +132,6 @@ void poll_event() {
   }
 }
 
-}  // namespace
-
 void draw_checkers() {
   for (auto i = 0; i < ConnectFour::board_rows; i++) {
     for (auto j = 0; j < ConnectFour::board_cols; j++) {
@@ -138,14 +140,26 @@ void draw_checkers() {
   }
 }
 
+void draw_text() {
+  for (auto&& i : text_to_render) {
+    window->draw(*i);
+  }
+}
+
+}  // namespace
+
 void update() { poll_event(); }
 
 void render() {
-  window->clear();
+  window->clear(sf::Color(25, 25, 25));
+
+  window->draw(background_rect);
 
   draw_checkers();
 
-  window->draw(background_sprite);
+  window->draw(board_sprite);
+
+  draw_text();
 
   window->display();
 }

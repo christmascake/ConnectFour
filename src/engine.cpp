@@ -19,14 +19,6 @@ constexpr auto window_title = "Connect Four";
 constexpr auto window_style = sf::Style::Titlebar | sf::Style::Close;
 constexpr auto window_fps_limit = 30;
 
-std::unique_ptr<ConnectFour> current_game = std::make_unique<ConnectFour>();
-
-sf::Event ev;
-
-std::array<std::array<sf::CircleShape, ConnectFour::board_cols>,
-           ConnectFour::board_rows>
-    circle_render_board;
-
 const std::unique_ptr<sf::RenderWindow> window = [] {
   auto t = std::make_unique<sf::RenderWindow>(
       sf::VideoMode(window_width, window_height), window_title, window_style);
@@ -34,6 +26,14 @@ const std::unique_ptr<sf::RenderWindow> window = [] {
   t->setIcon(window_icon_size, window_icon_size, windowIcon.getPixelsPtr());
   return t;
 }();
+
+std::unique_ptr<ConnectFour> current_game = std::make_unique<ConnectFour>();
+
+sf::Event ev;
+
+std::array<std::array<sf::CircleShape, ConnectFour::board_cols>,
+           ConnectFour::board_rows>
+    circle_render_board;
 
 sf::Text side_to_move_text = [] {
   auto t = consola_text;
@@ -65,6 +65,9 @@ void update_checkers() {
         } else if (checker_at_ij == ConnectFour::Side::yellow) {
           circle_at_ij.setFillColor(sf::Color::Yellow);
         }
+      } else {
+        sf::CircleShape t(0);
+        circle_at_ij = t;
       }
     }
   }
@@ -88,6 +91,8 @@ void handle_keyboard() {
         break;
       case sf::Keyboard::BackSpace:
         reset();
+        update_checkers();
+        update_text();
         break;
       default:
         break;
@@ -103,10 +108,19 @@ void handle_mouse() {
 
       try {
         if (current_game->make_move(row, col)) {
-          update_checkers();
-          update_text();
+          current_game->check_side_won();
         }
       } catch (...) {
+      }
+
+      update_checkers();
+      update_text();
+
+      if (current_game->side_won == ConnectFour::Side::red) {
+        std::cout << "red win" << std::endl;
+      }
+      if (current_game->side_won == ConnectFour::Side::yellow) {
+        std::cout << "yellow win" << std::endl;
       }
     }
   }

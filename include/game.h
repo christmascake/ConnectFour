@@ -20,9 +20,13 @@ class ConnectFour {
 
   bool make_move(const int row, const int col);
 
+  bool check_side_won();
+
   bool get_is_red_turn() const noexcept;
 
   Side getSideAt(const int row, const int col) const noexcept;
+
+  Side side_won = Side::none;
 
  private:
   enum class AI_Difficulty { easy, medium, hard };

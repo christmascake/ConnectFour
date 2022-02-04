@@ -7,6 +7,11 @@ namespace connect_four {
 ConnectFour::ConnectFour() : board{} { this->clear_board(); }
 
 bool ConnectFour::make_move(const int row, const int col) {
+  // if someone has already won
+  if (this->side_won != Side::none) {
+    return false;
+  }
+
   // if not placing checker at top
   if (row != 0) {
     return false;
@@ -34,6 +39,67 @@ bool ConnectFour::make_move(const int row, const int col) {
     return true;
   }
 
+  return false;
+}
+
+bool ConnectFour::check_side_won() {
+  for (auto i = 0; i < board_rows; i++) {
+    for (auto j = 0; j < board_cols; j++) {
+      // is there a checker at this spot?
+      if (this->board.at(i).at(j) != Side::none) {
+        auto& this_checker = this->board.at(i).at(j);
+        auto& this_row = this->board.at(i);
+
+        // is there 3 slots east of this checker?
+        if (j + 3 < board_cols) {
+          // are there 4 of a kind?
+          if (this_checker == this_row.at(j + 1) &&
+              this_row.at(j + 1) == this_row.at(j + 2) &&
+              this_row.at(j + 2) == this_row.at(j + 3)) {
+            this->side_won = this_checker;
+            return true;
+          }
+        }
+
+        // is there 3 slots south of this checker?
+        if (i + 3 < board_rows) {
+          // are there 4 of a kind?
+          if (this_checker == this->board.at(i + 1).at(j) &&
+              this->board.at(i + 1).at(j) == this->board.at(i + 2).at(j) &&
+              this->board.at(i + 2).at(j) == this->board.at(i + 3).at(j)) {
+            this->side_won = this_checker;
+            return true;
+          }
+        }
+
+        // is there 3 slots south-east of this checker?
+        if (i + 3 < board_rows && j + 3 < board_cols) {
+          // are there 4 of a kind?
+          if (this_checker == this->board.at(i + 1).at(j + 1) &&
+              this->board.at(i + 1).at(j + 1) ==
+                  this->board.at(i + 2).at(j + 2) &&
+              this->board.at(i + 2).at(j + 2) ==
+                  this->board.at(i + 3).at(j + 3)) {
+            this->side_won = this_checker;
+            return true;
+          }
+        }
+
+        // is there 3 slots south-west of this checker?
+        if (i + 3 < board_rows && j - 3 > 0) {
+          // are there 4 of a kind?
+          if (this_checker == this->board.at(i + 1).at(j - 1) &&
+              this->board.at(i + 1).at(j - 1) ==
+                  this->board.at(i + 2).at(j - 2) &&
+              this->board.at(i + 2).at(j - 2) ==
+                  this->board.at(i + 3).at(j - 3)) {
+            this->side_won = this_checker;
+            return true;
+          }
+        }
+      }
+    }
+  }
   return false;
 }
 

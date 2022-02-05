@@ -86,7 +86,7 @@ bool ConnectFour::check_side_won() {
         }
 
         // is there 3 slots south-west of this checker?
-        if (i + 3 < board_rows && j - 3 > 0) {
+        if (i + 3 < board_rows && j - 3 > -1) {
           // are there 4 of a kind?
           if (this_checker == this->board.at(i + 1).at(j - 1) &&
               this->board.at(i + 1).at(j - 1) ==
